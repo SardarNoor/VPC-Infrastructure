@@ -1,16 +1,16 @@
-# 🏗️ AWS VPC Architecture Implementation
+#  AWS VPC Architecture Implementation
 
 This repository documents the design and deployment of a **custom Virtual Private Cloud (VPC)** environment in AWS.  
 It demonstrates a production-grade network setup including public/private subnets, NAT Gateway, route tables, VPC endpoints, and traffic control via Security Groups and Network ACLs.
 
 ---
 
-## 📘 Project Summary
+##  Project Summary
 The objective of this task was to design and implement a secure, scalable, and multi-AZ VPC architecture to host EC2 instances in both public and private networks while ensuring controlled Internet access.
 
 ---
 
-## ⚙️ Components Implemented
+##  Components Implemented
 | No. | Component | Description |
 |-----|------------|-------------|
 | 1 | **Custom VPC** | Created VPC with CIDR `10.0.0.0/16` |
@@ -29,23 +29,23 @@ The objective of this task was to design and implement a secure, scalable, and m
 
 ---
 
-## 🖼 Architecture Diagram
+##  Architecture Diagram
 Below is the logical representation of the implemented AWS network architecture:
 
 ![VPC Architecture](NoorVPC.jpg)
 
-*(Replace `diagram.png` with your actual diagram filename.)*
+
 
 ---
 
-## 📄 Full Documentation
+##  Full Documentation
 Detailed configuration steps, verification outputs, and screenshots are available in the following document:
 
-👉 [**Task0 – VPC Architecture (PDF)**](Task0%20(VPC%20Architecture).pdf)
+ [**Task0 – VPC Architecture (PDF)**](Task0%20(VPC%20Architecture).pdf)
 
 ---
 
-## 🔍 Key Highlights
+##  Key Highlights
 - Multi-AZ setup ensures **fault tolerance and high availability**.  
 - **NAT Gateway + Route Tables** provide controlled Internet access.  
 - **Security Groups and NACLs** enforce layered network security.  
@@ -54,13 +54,4 @@ Detailed configuration steps, verification outputs, and screenshots are availabl
 
 ---
 
-## 🧠 Author
-**Sardar Noor Ul Hassan**  
-*DevOps Engineer | Cloud Infrastructure Specialist*  
-📍 Islamabad, Pakistan  
-📧 sardarnoorulhassan@example.com  
-🔗 [LinkedIn](https://linkedin.com/in/sardarnoorulhassan) | [GitHub](https://github.com/YOUR_USERNAME)
 
----
-
-## 📌 Repository Structure
