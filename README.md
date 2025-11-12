@@ -1,8 +1,4 @@
-Here’s your **final clean README.md** — fully formatted for GitHub, no placeholder text, ready to paste as-is.
 
----
-
-````markdown
 # AWS EC2 WordPress Deployment with Terraform
 
 ## Overview
