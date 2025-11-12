@@ -76,14 +76,14 @@ Terraform provisions:
 After successful provisioning:
 
 ```
-wordpress_public_ip = <your-public-ip>
-mysql_private_ip = <your-private-ip>
+wordpress_public_ip = <44.250.108.202>
+mysql_private_ip = <10.0.2.69>
 ```
 
 Open WordPress in browser:
 
 ```
-http://<wordpress_public_ip>
+http://<44.250.108.202>
 ```
 
 Complete the setup wizard and access the dashboard.
@@ -95,7 +95,7 @@ Complete the setup wizard and access the dashboard.
 1. SSH into WordPress EC2:
 
    ```bash
-   ssh -i your-key.pem ec2-user@<wordpress-public-ip>
+   ssh -i your-key.pem ec2-user@<44.250.108.202>
    ```
 2. Install MySQL client:
 
@@ -105,7 +105,7 @@ Complete the setup wizard and access the dashboard.
 3. Connect to MySQL using its private IP:
 
    ```bash
-   mysql -h <mysql-private-ip> -u noor -p
+   mysql -h <44.250.108.202> -u noor -p
    ```
 
    Password: `onePlus1@`
