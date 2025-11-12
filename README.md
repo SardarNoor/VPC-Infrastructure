@@ -1,57 +1,166 @@
-#  AWS VPC Architecture Implementation
-
-This repository documents the design and deployment of a **custom Virtual Private Cloud (VPC)** environment in AWS.  
-It demonstrates a production-grade network setup including public/private subnets, NAT Gateway, route tables, VPC endpoints, and traffic control via Security Groups and Network ACLs.
+Here’s your **final clean README.md** — fully formatted for GitHub, no placeholder text, ready to paste as-is.
 
 ---
 
-##  Project Summary
-The objective of this task was to design and implement a secure, scalable, and multi-AZ VPC architecture to host EC2 instances in both public and private networks while ensuring controlled Internet access.
+````markdown
+# AWS EC2 WordPress Deployment with Terraform
+
+## Overview
+This project automates the deployment of a complete **two-tier WordPress application** on AWS using **Terraform**.  
+It provisions two EC2 instances:
+- **WordPress Server (Public Subnet)** – runs Apache, PHP, and WordPress  
+- **MySQL Server (Private Subnet)** – runs MariaDB for database storage  
+
+Both instances are configured automatically using **user-data scripts**, eliminating all manual setup steps.  
+The project demonstrates Infrastructure as Code (IaC), AWS networking, and automation practices.
 
 ---
 
-##  Components Implemented
-| No. | Component | Description |
-|-----|------------|-------------|
-| 1 | **Custom VPC** | Created VPC with CIDR `10.0.0.0/16` |
-| 2 | **Subnets** | Two Public and Two Private Subnets across multiple Availability Zones |
-| 3 | **Internet Gateway (IGW)** | Provides outbound Internet access for Public Subnets |
-| 4 | **Route Tables** | Separate tables for Public and Private subnets with proper associations |
-| 5 | **NAT Gateway** | Allows outbound Internet traffic for instances in Private Subnets |
-| 6 | **EC2 Instances** | Deployed test instances in both Public and Private subnets |
-| 7 | **Security Groups** | Controlled inbound/outbound traffic (SSH, HTTP/HTTPS, ICMP) |
-| 8 | **Network ACLs** | Subnet-level access control rules configured |
-| 9 | **VPC Flow Logs** | Enabled for traffic monitoring through CloudWatch |
-| 10 | **VPC Endpoint (S3)** | Private connectivity to AWS S3 without Internet access |
-| 11 | **Elastic IPs** | Attached to NAT Gateway and Public EC2 for persistent public access |
-| 12 | **Tagging** | Applied consistent resource tags for cost and management |
-| 13 | **Connectivity Testing** | Verified communication between instances and Internet routing |
+## Architecture
+- **VPC** with CIDR block `10.0.0.0/16`
+- **Public Subnet (10.0.1.0/24)** → WordPress EC2  
+- **Private Subnet (10.0.2.0/24)** → MySQL EC2  
+- **Internet Gateway (IGW)** → Provides public internet access  
+- **NAT Gateway** → Enables outbound access for private subnet  
+- **Route Tables** → Public routes to IGW, private routes to NAT Gateway  
+- **Security Groups**
+  - `wp-sg` allows HTTP (80) and SSH (22)  
+  - `db-sg` allows MySQL (3306) only from `wp-sg`  
+- **EC2 Instances**
+  - WordPress (Amazon Linux 2023, public subnet)  
+  - MySQL (Amazon Linux 2023, private subnet)
 
 ---
 
-##  Architecture Diagram
-Below is the logical representation of the implemented AWS network architecture:
+## Files Description
 
-![VPC Architecture](NoorVPC.jpg)
-
-
-
----
-
-##  Full Documentation
-Detailed configuration steps, verification outputs, and screenshots are available in the following document:
-
- [**Task0 – VPC Architecture (PDF)**](Task0%20(VPC%20Architecture).pdf)
+| File | Description |
+|------|--------------|
+| `main.tf` | Defines provider, networking, EC2, and dependencies |
+| `variables.tf` | Stores configurable parameters like AMI IDs and key pair |
+| `outputs.tf` | Displays WordPress public IP and MySQL private IP |
+| `userdata-wordpress.sh` | Installs Apache, PHP, and WordPress automatically |
+| `userdata-mysql.sh` | Installs and configures MariaDB database automatically |
 
 ---
 
-##  Key Highlights
-- Multi-AZ setup ensures **fault tolerance and high availability**.  
-- **NAT Gateway + Route Tables** provide controlled Internet access.  
-- **Security Groups and NACLs** enforce layered network security.  
-- **VPC Flow Logs** enable network visibility and troubleshooting.  
-- **S3 VPC Endpoint** allows private AWS service connectivity.  
+## Deployment Steps
+
+### 1. Configure Environment
+Install Terraform and AWS CLI, then run:
+```bash
+aws configure
+terraform -version
+aws sts get-caller-identity
+````
+
+Use region `us-west-2`.
+
+### 2. Initialize Terraform
+
+```bash
+terraform init
+terraform validate
+```
+
+### 3. Apply Terraform
+
+```bash
+terraform apply -auto-approve
+```
+
+Terraform provisions:
+
+* VPC, subnets, Internet Gateway, and NAT Gateway
+* Security groups
+* Two EC2 instances (WordPress + MySQL)
+
+### 4. Retrieve Outputs
+
+After successful provisioning:
+
+```
+wordpress_public_ip = <your-public-ip>
+mysql_private_ip = <your-private-ip>
+```
+
+Open WordPress in browser:
+
+```
+http://<wordpress_public_ip>
+```
+
+Complete the setup wizard and access the dashboard.
 
 ---
 
+## Verifying Database Connectivity
 
+1. SSH into WordPress EC2:
+
+   ```bash
+   ssh -i your-key.pem ec2-user@<wordpress-public-ip>
+   ```
+2. Install MySQL client:
+
+   ```bash
+   sudo dnf install -y mariadb105
+   ```
+3. Connect to MySQL using its private IP:
+
+   ```bash
+   mysql -h <mysql-private-ip> -u noor -p
+   ```
+
+   Password: `onePlus1@`
+4. Verify:
+
+   ```bash
+   show databases;
+   ```
+
+   Output includes:
+
+   ```
+   wordpress_db
+   ```
+
+---
+
+## Problems and Solutions
+
+| Problem                                  | Cause                                          | Solution                                                   |
+| ---------------------------------------- | ---------------------------------------------- | ---------------------------------------------------------- |
+| `source_security_group_id` not supported | Terraform AWS provider v5+ changed rule syntax | Created a separate `aws_security_group_rule` resource      |
+| `Invalid value for vars map: DB_HOST`    | Wrong variable case in template                | Changed `${DB_HOST}` to `${db_host}`                       |
+| `InvalidAMIID.NotFound`                  | Wrong AMI ID for selected region               | Used correct Amazon Linux 2023 AMI `ami-04f9aa2b7c7091927` |
+| `InvalidAccessKeyId`                     | AWS CLI not configured                         | Ran `aws configure` with valid credentials                 |
+| MariaDB not starting                     | Wrong package for Amazon Linux                 | Used `dnf install mariadb105-server`                       |
+| Terraform provider mismatch              | Lock file used AWS provider v6                 | Updated version to `~> 6.0` and reinitialized              |
+
+---
+
+## Final Output
+
+* WordPress site running and accessible via public IP
+* MySQL database hosted securely in private subnet
+* Connection verified between WordPress and MySQL
+* Terraform managing all resources automatically
+
+---
+
+## Author
+
+**Sardar Noor Ul Hassan**
+Cloud Intern – Cloudelligent
+
+---
+
+## Conclusion
+
+This project successfully automated a full WordPress deployment using Terraform on AWS.
+It showcases how Infrastructure as Code (IaC) can manage complex cloud environments efficiently.
+The setup follows best practices with VPC isolation, automation via user data, and reusable Terraform configuration.
+
+```
+```
